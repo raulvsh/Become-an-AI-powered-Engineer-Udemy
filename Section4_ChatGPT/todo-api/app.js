@@ -1,7 +1,9 @@
+// Import required modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+// Create an Express application
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -9,7 +11,7 @@ const port = process.env.PORT || 3000;
 mongoose.connect('mongodb://localhost/todos', { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// Create a Todo model
+// Create a Todo model using Mongoose
 const Todo = mongoose.model('Todo', {
     text: String,
     completed: Boolean
@@ -22,15 +24,18 @@ let todos = [
     { id: 3, task: "Learn Node.js3", status: true }
 ];
 
-// Middleware to parse JSON
+// Middleware to parse JSON data
 app.use(bodyParser.json());
 
-// Routes
+// Define API routes
+
+// Get all Todos
 app.get('/todos', async (req, res) => {
     //const todos = await Todo.find();
     res.json(todos);
 });
 
+// Create a new Todo
 app.post('/todos', async (req, res) => {
     const newTodo = new Todo({
         text: req.body.text,
@@ -40,6 +45,7 @@ app.post('/todos', async (req, res) => {
     res.json(newTodo);
 });
 
+// Update a Todo by ID
 app.put('/todos/:id', async (req, res) => {
     const id = req.params.id;
     const updates = { completed: req.body.completed };
@@ -47,13 +53,14 @@ app.put('/todos/:id', async (req, res) => {
     res.json(todo);
 });
 
+// Delete a Todo by ID
 app.delete('/todos/:id', async (req, res) => {
     const id = req.params.id;
     await Todo.findByIdAndRemove(id);
     res.sendStatus(200);
 });
 
-// Start the server
+// Start the server and listen on the specified port
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
